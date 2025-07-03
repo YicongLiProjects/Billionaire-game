@@ -5,7 +5,7 @@ provide various small buffs and can be upgraded too, just like businesses; they 
 The second type of items is temporary items, that can be bought once daily from an item shop that refreshes every day. They also provide buffs to the player, but they have to be consumed the 
 same day as they are purchased, or else they will be removed regardless of whether you've used the buff or not. 
 
-Note: Some icons may not be rendered properly on the UI, but they are for visual purposes only. As a reminder, the 4 slots in the "permanent items" section correspond to "book of business" (leftmost), "construction license" (middle-left), "multi-use voucher" (middle-right), and "toolbox" (rightmost). You can always go to the "upgrade items" section to see your purchased items 
+Note: Some icons may not be rendered properly on the UI of the installer version, but they are for visual purposes only. As a reminder, the 4 slots in the "permanent items" section correspond to "book of business" (leftmost), "construction license" (middle-left), "multi-use voucher" (middle-right), and "toolbox" (rightmost). You can always go to the "upgrade items" section to see your purchased items 
 and their levels. 
 
 You can install Java on your computer and input the following command to run the game, if you insist on the images rendering properly: java -jar Billionaire!.jar

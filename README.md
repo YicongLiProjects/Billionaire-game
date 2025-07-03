@@ -4,3 +4,6 @@ day. There are also items that help you along your journey to getting rich! Ther
 provide various small buffs and can be upgraded too, just like businesses; they both have 10 levels (maximum level is 10). Permanent items also have icons that are added when they are bought. 
 The second type of items is temporary items, that can be bought once daily from an item shop that refreshes every day. They also provide buffs to the player, but they have to be consumed the 
 same day as they are purchased, or else they will be removed regardless of whether you've used the buff or not. 
+
+Note: Some icons may not be rendered properly on the UI and will be fixed in a later patch (final release). As a reminder, the 4 slots in the "permanent items" section correspond to "book of business" (leftmost), "construction license" (middle-left), "multi-use voucher" (middle-right), and "toolbox" (rightmost). You can always go to the "upgrade items" section to see your purchased items 
+and their levels.

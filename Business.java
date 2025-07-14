@@ -1,21 +1,23 @@
-import javax.swing.JOptionPane;
 
 public final class Business {
 	private String name;
 	private int level;
 	private int revenue;
+	private int baseCost;
 	private int cost;
 	private Game game;
 	
 	// Class variable used to track free business upgrades, or 2 upgrades in 1
 	private static boolean deductMoney = true;
 	
-	public Business(Game game, String name, int cost) {
+	public Business(Game game, String name, int baseCost) {
 		this.game = game;
 		this.name = name;
 		this.level = 0;
-		this.cost = cost;
-		this.revenue = (int) (this.cost * 2.5);
+		this.baseCost = baseCost;
+		this.cost = (int) (baseCost * this.game.getBusinessPurchaseMultiplier() * this.game.getPermItemBusinessPurchaseMultiplier()
+				* this.game.getUpgradeCostMultiplier());
+		this.revenue = (int) (baseCost * 2.5 * this.game.getRevenueMultiplier() * this.game.getPermItemRevenueMultiplier());
 	}
 
 	public int getRevenue() {
@@ -24,6 +26,14 @@ public final class Business {
 
 	public void setRevenue(int revenue) {
 		this.revenue = revenue;
+	}
+
+	public int getBaseCost() {
+		return baseCost;
+	}
+
+	public void setBaseCost(int baseCost) {
+		this.baseCost = baseCost;
 	}
 
 	public int getCost() {
@@ -59,48 +69,37 @@ public final class Business {
 	 * and is not at its max level.
 	 */
 	public boolean upgrade() {
-		if (level == 0) {
-			JOptionPane.showMessageDialog(null, "You cannot upgrade this business! Please buy it first", 
-					"Business not purchased yet", JOptionPane.INFORMATION_MESSAGE);
-			return false;
-		}
-		else if (level == 10) {
-			JOptionPane.showMessageDialog(null, "This business is already at the maximum level!", "Maximum level reached", 
-					JOptionPane.INFORMATION_MESSAGE);
+		if (level == 0 || level == 10) {
 			return false;
 		}
 		else if (deductMoney && this.game.getMoneyAmount() < this.cost) {
-			JOptionPane.showMessageDialog(null, "You can't afford to upgrade this business!", "Insufficient funds", 
-					JOptionPane.INFORMATION_MESSAGE);
 			return false;
 		}
 		
 		this.level++;
 		if (deductMoney) {
-			int newMoneyValue = this.game.getMoneyAmount() - this.getCost();
-			int newTotalSpent = this.game.getSpentMoney() + this.getCost();
-			this.game.getGui().getTotalMoneySpentTextArea().setText(Integer.toString(newTotalSpent) + "$");
+			int newMoneyValue = this.game.getMoneyAmount() - this.cost;
 			this.game.setMoneyAmount(newMoneyValue);
-			this.game.setSpentMoney(newTotalSpent);
 			this.game.getGui().getMoneyAmount().setText(Integer.toString(newMoneyValue));
+			
+			int newTotalSpent = this.game.getSpentMoney() + this.cost;
+			this.game.getGui().getTotalMoneySpentTextArea().setText(Integer.toString(newTotalSpent) + "$");
+			this.game.setSpentMoney(newTotalSpent);
+			
+			this.game.setBusinessUpgradeMultiplier(1.0);
+			this.game.setUpgradeCostMultiplier(1.0);
 		}
-		else {
-			JOptionPane.showMessageDialog(null, "This upgrade is free!", "Free upgrade", JOptionPane.INFORMATION_MESSAGE);
-		}
-		this.game.setBusinessUpgradeMultiplier(1.0);
-		this.game.setUpgradeCostMultiplier(1.0);
 		
-		this.cost = (int) (this.cost * game.getBusinessUpgradeMultiplier() * game.getPermItemBusinessUpgradeMultiplier() * 
-				game.getUpgradeCostMultiplier() * 1.3);
-		this.revenue = (int) (this.revenue * game.getRevenueMultiplier() * game.getPermItemRevenueMultiplier() * 
-				game.getUpgradeCostMultiplier() * 1.4);
+		this.baseCost = (int) (this.baseCost * 1.3);
+		this.cost = this.game.calculateBusinessUpgradeCost(this);
+		this.revenue = (int) (this.revenue * game.getRevenueMultiplier() * game.getPermItemRevenueMultiplier() * 1.4);
 		
 		if (this.game.getNbUpgrades() == 2) {
 			this.game.setNbUpgrades(1);
 			deductMoney = false;
 			upgrade();
 		}
-		int newRevenue = this.game.calculateRevenue();
+		int newRevenue = this.game.calculateExpectedRevenue();
 		this.game.getGui().getExpectedRevenue().setText(Integer.toString(newRevenue));
 		deductMoney = true;
 		return true;

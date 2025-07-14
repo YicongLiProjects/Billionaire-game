@@ -2,22 +2,28 @@
 public abstract class Item {
 	private Buff buff;
 	private String name;
-	private int cost;
+	private int baseCost;
 	
 	private Game game;
-	
-	public Item(Game game, String name, int cost) {
+	/*
+	 * Template for permanent items
+	 * It will interface with the game, and it will have a name and a base cost (cost before multipliers are applied)
+	 */
+	public Item(Game game, String name, int baseCost) {
 		this.game = game;
 		this.name = name;
-		this.cost = cost;
+		this.baseCost = baseCost;
 	}
 	
-	
-	public Item(Game game, Buff buff, String name, int cost) {
+	/*
+	 * Template for temporary items, similar to the template for permanent items.
+	 * However, it will contain an enum that specifies the buff of this item
+	 */
+	public Item(Game game, Buff buff, String name, int baseCost) {
 		this.game = game;
 		this.buff = buff;
 		this.name = name;
-		this.cost = cost;
+		this.baseCost = baseCost;
 	}
 	
 
@@ -29,12 +35,12 @@ public abstract class Item {
 		return name;
 	}
 
-	public int getCost() {
-		return cost;
+	public int getBaseCost() {
+		return baseCost;
 	}
 	
-	public void setCost(int cost) {
-		this.cost = cost;
+	public void setBaseCost(int baseCost) {
+		this.baseCost = baseCost;
 	}
 
 	public Game getGame() {

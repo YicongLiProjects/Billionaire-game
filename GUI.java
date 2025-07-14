@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import java.awt.CardLayout;
 import javax.swing.JLabel;
 import java.awt.Font;
+
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.DefaultListModel;
@@ -60,7 +61,6 @@ public class GUI {
 	private JButton gameCreditsButton;
 	private JLabel scoreLabel;
 	private JTextField scoreField;
-	private JButton mainMenuButton;
 	
 	/*
 	 * The player starts the game with 30$
@@ -124,6 +124,8 @@ public class GUI {
 			public void run() {
 				try {
 					GUI window = new GUI();
+					window.frmBillionaire.pack();
+					window.frmBillionaire.setSize(450, 300);
 					window.frmBillionaire.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -145,7 +147,7 @@ public class GUI {
 	private void initialize() {
 		frmBillionaire = new JFrame();
 		frmBillionaire.setTitle("Billionaire!");
-		frmBillionaire.setIconImage(Toolkit.getDefaultToolkit().getImage("money.png"));
+		frmBillionaire.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/money.jpg")));
 		frmBillionaire.setBounds(100, 100, 450, 300);
 		frmBillionaire.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		CardLayout cardLayout = new CardLayout(0, 0);
@@ -156,7 +158,7 @@ public class GUI {
 		mainMenuPanel.setLayout(null);
 		
 		gameNameLabel = new JLabel("Billionaire!");
-		gameNameLabel.setIcon(new ImageIcon("dollar-symbol.png"));
+		gameNameLabel.setIcon(new ImageIcon(getClass().getResource("/images/dollar-symbol.jpg")));
 		gameNameLabel.setFont(new Font("Comic Sans MS", Font.PLAIN, 30));
 		gameNameLabel.setBounds(117, 35, 196, 55);
 		mainMenuPanel.add(gameNameLabel);
@@ -239,7 +241,7 @@ public class GUI {
 			public void actionPerformed(ActionEvent e) {
 				
 				PermanentItem book = game.getPermanentItems()[0];
-				if (game.getMoneyAmount() < book.getCost()) {
+				if (game.getMoneyAmount() < book.getBaseCost()) {
 					JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this item!",
 							"Insufficient funds", JOptionPane.INFORMATION_MESSAGE);
 					return;
@@ -274,7 +276,7 @@ public class GUI {
 		constructionLicenseEntry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				PermanentItem license = game.getPermanentItems()[1];
-				if (game.getMoneyAmount() < license.getCost()) {
+				if (game.getMoneyAmount() < license.getBaseCost()) {
 					JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this item!",
 							"Insufficient funds", JOptionPane.INFORMATION_MESSAGE);
 					return;
@@ -310,7 +312,7 @@ public class GUI {
 		multiUseVoucherEntry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				PermanentItem voucher = game.getPermanentItems()[2];
-				if (game.getMoneyAmount() < voucher.getCost()) {
+				if (game.getMoneyAmount() < voucher.getBaseCost()) {
 					JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this item!",
 							"Insufficient funds", JOptionPane.INFORMATION_MESSAGE);
 					return;
@@ -346,7 +348,7 @@ public class GUI {
 		toolboxEntry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				PermanentItem toolbox = game.getPermanentItems()[3];
-				if (game.getMoneyAmount() < toolbox.getCost()) {
+				if (game.getMoneyAmount() < toolbox.getBaseCost()) {
 					JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this item!",
 							"Insufficient funds", JOptionPane.INFORMATION_MESSAGE);
 					return;
@@ -443,7 +445,9 @@ public class GUI {
 				
 				int confirmUpgrade = JOptionPane.showConfirmDialog(null, "Do you want to upgrade this business?", 
 						"Upgrade business", JOptionPane.INFORMATION_MESSAGE);
-				
+				if (!Business.isDeductMoney()) {
+					JOptionPane.showMessageDialog(null, "This upgrade is free!", "Free upgrade", JOptionPane.INFORMATION_MESSAGE);
+				}
 				if (confirmUpgrade == 0) {
 					businesses.getSelectedValue().upgrade();
 				}
@@ -468,12 +472,12 @@ public class GUI {
 				}
 				else if (!game.getBoughtBusinesses().contains(selectedBusiness)) {
 					JOptionPane.showMessageDialog(null, "Name: " + selectedBusiness.getName() + "\nPrice: " + 
-				selectedBusiness.getCost() + "$");
+				selectedBusiness.getCost() + "$", "Business information", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
 				JOptionPane.showMessageDialog(null, "Name: " + selectedBusiness.getName() + "\nLevel: " + 
 				selectedBusiness.getLevel() + "\nRevenue generated: " + selectedBusiness.getRevenue() + "$" +
-						"\nUpgrade cost: " + selectedBusiness.getCost() + "$");
+						"\nUpgrade cost: " + selectedBusiness.getCost() + "$", "Business information", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		infoButton.setFont(new Font("Cooper Black", Font.PLAIN, 11));
@@ -510,6 +514,7 @@ public class GUI {
 				game.endDay();
 				if (game.isBillionaire()) {
 					cardLayout.show(frmBillionaire.getContentPane(), "gameOverPanel");
+					scoreField.setText(Integer.toString(game.calculateScore()));
 				}
 			}
 		});
@@ -533,7 +538,7 @@ public class GUI {
 		expectedRevenue.setBounds(136, 26, 96, 20);
 		expectedRevenue.setFocusable(false);
 		expectedRevenue.setEditable(false);
-		expectedRevenue.setText(Integer.toString(game.calculateRevenue()));
+		expectedRevenue.setText(Integer.toString(game.calculateExpectedRevenue()));
 		gamePanel.add(expectedRevenue);
 		expectedRevenue.setColumns(10);
 		
@@ -581,7 +586,7 @@ public class GUI {
 		daysPassed = new JLabel("Days Passed");
 		daysPassed.setFont(new Font("Comic Sans MS", Font.PLAIN, 11));
 		daysPassed.setBounds(325, 235, 98, 20);
-		daysPassed.setIcon(new ImageIcon("sun.png"));
+		daysPassed.setIcon(new ImageIcon(getClass().getResource("/images/sun.jpg")));
 		gamePanel.add(daysPassed);
 		
 		businessesSection = new JScrollPane();
@@ -628,7 +633,7 @@ public class GUI {
 			}
 		});
 		quitButton.setFont(new Font("Cooper Black", Font.PLAIN, 15));
-		quitButton.setBounds(125, 217, 159, 37);
+		quitButton.setBounds(125, 179, 159, 37);
 		gameOverPanel.add(quitButton);
 		
 		gameCreditsButton = new JButton("Credits");
@@ -648,24 +653,12 @@ public class GUI {
 		gameOverPanel.add(scoreLabel);
 		
 		scoreField = new JTextField();
-		scoreField.setText(Integer.toString(game.calculateScore()));
 		scoreField.setEditable(false);
 		scoreField.setFont(new Font("Comic Sans MS", Font.PLAIN, 15));
 		scoreField.setBounds(185, 65, 96, 31);
 		scoreField.setFocusable(false);
 		gameOverPanel.add(scoreField);
 		scoreField.setColumns(10);
-		
-		mainMenuButton = new JButton("Main Menu");
-		mainMenuButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				cardLayout.show(frmBillionaire.getContentPane(), "mainMenuPanel");
-				resetGame();
-			}
-		});
-		mainMenuButton.setFont(new Font("Cooper Black", Font.PLAIN, 15));
-		mainMenuButton.setBounds(125, 169, 159, 37);
-		gameOverPanel.add(mainMenuButton);
 		
 		upgradePanel = new JPanel();
 		frmBillionaire.getContentPane().add(upgradePanel, "upgradePanel");
@@ -714,6 +707,9 @@ public class GUI {
 				int confirmUpgrade = JOptionPane.showConfirmDialog(null, "Do you want to upgrade the book of business?",
 						"Confirm upgrade", JOptionPane.YES_NO_OPTION);
 				
+				if (!PermanentItem.isDeductMoney()) {
+					JOptionPane.showMessageDialog(null, "This upgrade is free!", "Free upgrade", JOptionPane.INFORMATION_MESSAGE);
+				}
 				if (confirmUpgrade == 0) {
 					book.upgrade();
 				}
@@ -750,6 +746,10 @@ public class GUI {
 				
 				int confirmUpgrade = JOptionPane.showConfirmDialog(null, "Do you want to upgrade the construction license?",
 						"Confirm upgrade", JOptionPane.YES_NO_OPTION);
+				
+				if (!PermanentItem.isDeductMoney()) {
+					JOptionPane.showMessageDialog(null, "This upgrade is free!", "Free upgrade", JOptionPane.INFORMATION_MESSAGE);
+				}
 				
 				if (confirmUpgrade == 0) {
 					license.upgrade();
@@ -788,6 +788,10 @@ public class GUI {
 				int confirmUpgrade = JOptionPane.showConfirmDialog(null, "Do you want to upgrade the multi-use voucher?",
 						"Confirm upgrade", JOptionPane.YES_NO_OPTION);
 				
+				if (!PermanentItem.isDeductMoney()) {
+					JOptionPane.showMessageDialog(null, "This upgrade is free!", "Free upgrade", JOptionPane.INFORMATION_MESSAGE);
+				}
+				
 				if (confirmUpgrade == 0) {
 					voucher.upgrade();
 				}
@@ -824,6 +828,10 @@ public class GUI {
 				
 				int confirmUpgrade = JOptionPane.showConfirmDialog(null, "Do you want to upgrade the tool box?",
 						"Confirm upgrade", JOptionPane.YES_NO_OPTION);
+				
+				if (!PermanentItem.isDeductMoney()) {
+					JOptionPane.showMessageDialog(null, "This upgrade is free!", "Free upgrade", JOptionPane.INFORMATION_MESSAGE);
+				}
 				
 				if (confirmUpgrade == 0) {
 					toolbox.upgrade();

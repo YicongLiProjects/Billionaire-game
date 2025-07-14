@@ -6,15 +6,18 @@ public final class PermanentItem extends Item {
 	private int level;
 	// This icon will be displayed on the JTable cell representing the item
 	private ImageIcon icon;
+	private int cost;
 	
 	// Used for free upgrades or two upgrades in one
 	private static boolean deductMoney = true;
 	
-	public PermanentItem(Game game, String name, int cost, ImageIcon icon) {
-		super(game, name, cost);
+	public PermanentItem(Game game, String name, int baseCost, ImageIcon icon) {
+		super(game, name, baseCost);
 		// TODO Auto-generated constructor stub
 		this.level = 0;
 		this.icon = icon;
+		this.cost = (int) (baseCost * this.getGame().getPermItemUpgradeMultiplier() * this.getGame().getItemUpgradePriceMultiplier()
+				* this.getGame().getUpgradeCostMultiplier());
 	}
 
 	public ImageIcon getIcon() {
@@ -29,7 +32,7 @@ public final class PermanentItem extends Item {
 		switch(name) {
 			case "Book of business":
 				this.getGame().setPermItemRevenueMultiplier(1.2);
-				this.getGame().calculateRevenue();
+				this.getGame().calculateExpectedRevenue();
 				break;
 			case "Construction license":
 				this.getGame().setPermItemBusinessUpgradeMultiplier(0.9);
@@ -55,25 +58,27 @@ public final class PermanentItem extends Item {
 	 * enough money to upgrade, warn the player.
 	 */
 	public boolean upgrade() {
+		if (this.level == 0 || this.level == 10) {
+			return false;
+		}
+		else if (this.getGame().getMoneyAmount() < this.getCost() && deductMoney) {
+			return false;
+		}
 		this.level++;
 		// If the player has a TWO_UPGRADES buff, only deduct the money once
 		if (deductMoney) {
 			int newMoneyValue = this.getGame().getMoneyAmount() - this.getCost();
-			int newTotalSpent = this.getGame().getSpentMoney() + this.getCost();
-			this.getGame().getGui().getTotalMoneySpentTextArea().setText(Integer.toString(newTotalSpent) + "$");
 			this.getGame().setMoneyAmount(newMoneyValue);
-			this.getGame().setSpentMoney(newTotalSpent);
 			this.getGame().getGui().getMoneyAmount().setText(Integer.toString(newMoneyValue));
+			int newTotalSpent = this.getGame().getSpentMoney() + this.getCost();
+			this.getGame().setSpentMoney(newTotalSpent);
+			this.getGame().getGui().getTotalMoneySpentTextArea().setText(Integer.toString(newTotalSpent) + "$");
+			
+			this.getGame().setItemUpgradePriceMultiplier(1.0);
+			this.getGame().setUpgradeCostMultiplier(1.0);
 		}
-		else {
-			JOptionPane.showMessageDialog(null, "This upgrade is free!", "Free upgrade", JOptionPane.INFORMATION_MESSAGE);
-		}
-
-		this.getGame().setItemUpgradePriceMultiplier(1.0);
-		this.getGame().setUpgradeCostMultiplier(1.0);
 		
-		int cost = (int) (this.getCost() * this.getGame().getPermItemUpgradeMultiplier() * 
-				this.getGame().getItemUpgradePriceMultiplier() * this.getGame().getUpgradeCostMultiplier() * 1.2);
+		int cost = (int) (this.getGame().calculateItemUpgradeCost(this) * 2.0);
 		this.setCost(cost);
 		
 		// Increase the buff when the item is upgraded
@@ -88,7 +93,7 @@ public final class PermanentItem extends Item {
 				this.getGame().getGui().getBookUpgradeProgressBar().setValue(level);
 				this.getGame().getGui().getBookUpgradeProgressBar().setString("Level " + level);
 				
-				int newRevenue = this.getGame().calculateRevenue();
+				int newRevenue = this.getGame().calculateExpectedRevenue();
 				this.getGame().getGui().getExpectedRevenue().setText(Integer.toString(newRevenue));
 				break;
 			case "Construction license":
@@ -155,12 +160,20 @@ public final class PermanentItem extends Item {
 		PermanentItem.deductMoney = deductMoney;
 	}
 
+	public int getCost() {
+		return cost;
+	}
+
+	public void setCost(int cost) {
+		this.cost = cost;
+	}
+
 	@Override
 	public String toString() {
 		if (this.level >= 1) {
 			return this.getName() + ", level " + this.getLevel() + ", " + this.getCost() + "$";
 		}
-		return this.getName() + ", " + this.getCost() + "$";
+		return this.getName() + ", " + this.getBaseCost() + "$";
 	}
 
 	/*

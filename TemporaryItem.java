@@ -4,8 +4,8 @@ public final class TemporaryItem extends Item implements Comparable<TemporaryIte
 	private int level;
 	private boolean used = false;
 	
-	public TemporaryItem(Game game, Buff buff, String name, int cost) {
-		super(game, buff, name, cost);
+	public TemporaryItem(Game game, Buff buff, String name, int baseCost) {
+		super(game, buff, name, baseCost);
 		this.level = 0;
 		// TODO Auto-generated constructor stub
 	}
@@ -13,8 +13,8 @@ public final class TemporaryItem extends Item implements Comparable<TemporaryIte
 	/*
 	 * Some temporary items have different levels for the buff they apply
 	 */
-	public TemporaryItem(Game game, Buff buff, String name, int cost, int level) {
-		super(game, buff, name, cost);
+	public TemporaryItem(Game game, Buff buff, String name, int baseCost, int level) {
+		super(game, buff, name, baseCost);
 		this.level = level;
 	}
 	
@@ -83,7 +83,7 @@ public final class TemporaryItem extends Item implements Comparable<TemporaryIte
 						this.getGame().setRevenueMultiplier(2.0);
 						break;
 				}
-				this.getGame().calculateRevenue();
+				this.getGame().calculateExpectedRevenue();
 				break;
 			// Efficient tools renting coupon
 			case PERMANENT_ITEM_UPGRADE_COST_DECREASE:
@@ -151,7 +151,7 @@ public final class TemporaryItem extends Item implements Comparable<TemporaryIte
 				}
 				this.getGame().recalculateBusinessUpgradeCost();
 				this.getGame().recalculateItemUpgradeCost();
-				this.getGame().calculateRevenue();
+				this.getGame().calculateExpectedRevenue();
 				break;
 			// Hammer
 			case ONE_FREE_PERMANENT_ITEM_UPGRADE:
@@ -187,7 +187,7 @@ public final class TemporaryItem extends Item implements Comparable<TemporaryIte
 				break;
 			case REVENUE_INCREASE:
 				this.getGame().setRevenueMultiplier(1.0);
-				this.getGame().calculateRevenue();
+				this.getGame().calculateExpectedRevenue();
 				break;
 			case PERMANENT_ITEM_UPGRADE_COST_DECREASE:
 				this.getGame().setItemUpgradePriceMultiplier(1.0);
@@ -224,7 +224,7 @@ public final class TemporaryItem extends Item implements Comparable<TemporaryIte
 						this.getGame().setPermItemUpgradeMultiplier(this.getGame().getPermItemUpgradeMultiplier() + 0.15);
 						break;
 				}
-				this.getGame().calculateRevenue();
+				this.getGame().calculateExpectedRevenue();
 				this.getGame().recalculateBusinessUpgradeCost();
 				this.getGame().recalculateItemUpgradeCost();
 				break;
@@ -256,9 +256,9 @@ public final class TemporaryItem extends Item implements Comparable<TemporaryIte
 	@Override
 	public String toString() {
 		if (this.level >= 1) {
-			return this.getName() + ", level " + this.getLevel() + ", " + this.getCost() + "$";
+			return this.getName() + ", level " + this.getLevel() + ", " + this.getBaseCost() + "$";
 		}
-		return this.getName() + ", " + this.getCost() + "$";
+		return this.getName() + ", " + this.getBaseCost() + "$";
 	}
 
 	/*
@@ -276,11 +276,12 @@ public final class TemporaryItem extends Item implements Comparable<TemporaryIte
 
 	/*
 	 * Compare all temporary items by levels, if they have one
+	 * For testing purposes.
 	 */
 	@Override
 	public int compareTo(TemporaryItem t) {
-		if (!(t instanceof TemporaryItem)) {
-			throw new IllegalArgumentException("Cannot compare the items!");
+		if (!(t instanceof TemporaryItem) || !(t.getBuff() == this.getBuff()) || !(t.getName().equals(this.getName()))) {
+			return 0;
 		}
 		if (this.level < t.level) {
 			return -1;

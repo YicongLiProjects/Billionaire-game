@@ -1,10 +1,4 @@
-Billionaire! is a small video game inspired from Adventure capitalist and Whirling Waltz from Genshin impact version 5.6. The goal is to earn 1 billion $ in-game, which the title suggests, 
-by managing various businesses and earn money from them. You can purchase and upgrade those businesses to increase your daily revenue that can be collected when you choose to end the in-game 
-day. There are also items that help you along your journey to getting rich! There are 2 types of items, permanent and temporary. Permanent items are permanent and last until you win, they 
-provide various small buffs and can be upgraded too, just like businesses; they both have 10 levels (maximum level is 10). Permanent items also have icons that are added when they are bought. 
-The second type of items is temporary items, that can be bought once daily from an item shop that refreshes every day. They also provide buffs to the player, but they have to be consumed the 
-same day as they are purchased, or else they will be removed regardless of whether you've used the buff or not. 
-
+Billionaire! is a business management game where the goal is to earn 1 billion in-game $ by buying and upgrading various businesses that generates revenue each in-game day. There are also temporary items that can be bought from a rotating item shop as well as 4 permanent items represented by images that bring permanent buffs to speed up progression. You can end the day by pressing a button at the bottom right corner of the screen and there'll be brief report on the day's revenue grand total taking into account buffs. There are 13 businesses ordered from least to most expensive each with 10 levels available for the user and each one will generate more revenue than the previous.
 
 You can install Java on your computer and input the following command to run the game: java -jar Billionaire!.jar
 
